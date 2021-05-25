@@ -1,17 +1,25 @@
 {
-  "name": "crud-user-api",
+  "name": "bookmark",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/server.js",
-    "lint": "standard --fix"
+    "dev": "nodemon src/server.js"
+  },
+  "lint-staged": {
+    "*.js": "standard --fix"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.2"
   },
   "devDependencies": {
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
     "nodemon": "^2.0.7",
+    "sequelize-cli": "^6.2.0",
     "standard": "^16.0.3"
   }
 }

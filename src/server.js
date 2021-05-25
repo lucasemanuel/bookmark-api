@@ -1,4 +1,6 @@
 const express = require('express')
 const app = express()
 
-app.listen(3000, () => console.log('Listen in port 3333'))
+require('dotenv').config()
+
+app.listen(process.env.PORT, () => console.log('Server started!'))
