@@ -11,5 +11,12 @@ module.exports = {
     const link = await Link.create({ title, url })
 
     res.status(201).json(link)
+  },
+  destroy: async (req, res) => {
+    const { id } = req.params
+    const link = await Link.findOne({ where: { id } })
+    link.destroy()
+
+    res.status(204).send()
   }
 }
