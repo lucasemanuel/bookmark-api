@@ -1,15 +1,26 @@
-const sequelize = require('../database')
-const { DataTypes } = require('sequelize')
+'use strict'
 
-const Link = sequelize.define(
-  'link',
-  {
-    title: DataTypes.STRING,
-    url: DataTypes.STRING
-  },
-  {
-    sequelize
+const { Model } = require('sequelize')
+
+module.exports = (sequelize, DataTypes) => {
+  class Link extends Model {
+    static associate (models) {
+      Link.belongsToMany(models.Tag, {
+        through: 'LinkTags',
+        as: 'tags',
+        foreignKey: 'linkId'
+      })
+    }
   }
-)
-
-module.exports = Link
+  Link.init(
+    {
+      title: DataTypes.STRING,
+      url: DataTypes.STRING
+    },
+    {
+      sequelize,
+      modelName: 'Link'
+    }
+  )
+  return Link
+}
