@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.createTable('links', {
+    return queryInterface.createTable('Links', {
       id: {
         type: Sequelize.INTEGER.UNSIGNED,
         primaryKey: true,
@@ -16,11 +16,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      created_at: {
+      createdAt: {
         type: Sequelize.DATE,
         allowNull: false
       },
-      updated_at: {
+      updatedAt: {
         type: Sequelize.DATE,
         allowNull: false
       }
@@ -28,6 +28,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('links')
+    return queryInterface.dropTable('Links')
   }
 }

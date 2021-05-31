@@ -2,34 +2,42 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.createTable('link_tags', {
+    return queryInterface.createTable('LinkTags', {
       id: {
         type: Sequelize.INTEGER.UNSIGNED,
         primaryKey: true,
         autoIncrement: true
       },
-      link_id: {
+      linkId: {
         type: Sequelize.INTEGER.UNSIGNED,
         allowNull: false,
         onDelete: 'CASCADE',
         references: {
-          model: 'links',
+          model: 'Links',
           key: 'id'
         }
       },
-      tag_id: {
+      tagId: {
         type: Sequelize.INTEGER.UNSIGNED,
         allowNull: false,
         onDelete: 'CASCADE',
         references: {
-          model: 'tags',
+          model: 'Tags',
           key: 'id'
         }
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false
       }
     })
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('link_tags')
+    return queryInterface.dropTable('LinkTags')
   }
 }
