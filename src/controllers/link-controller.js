@@ -2,7 +2,12 @@ const { Link, Tag } = require('../models')
 
 module.exports = {
   index: async (req, res) => {
-    const links = await Link.findAll()
+    const links = await Link.findAll({
+      include: {
+        model: Tag,
+        as: 'tags'
+      }
+    })
 
     res.json(links)
   },
