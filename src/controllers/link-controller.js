@@ -1,4 +1,4 @@
-const Link = require('../models/link')
+const { Link, Tag } = require('../models')
 
 module.exports = {
   index: async (req, res) => {
@@ -7,8 +7,30 @@ module.exports = {
     res.json(links)
   },
   store: async (req, res) => {
-    const { title, url } = req.body
-    const link = await Link.create({ title, url })
+    const { title, url, tags } = req.body
+    let link = await Link.create({ title, url })
+
+    const promisesFindOrCreateTags = tags.map(({ name }) =>
+      Tag.findOrCreate({
+        where: { name }
+      })
+    )
+
+    const promiseResults = await Promise.all(promisesFindOrCreateTags)
+    for (const result of promiseResults) {
+      const [tag] = result
+      await link.addTag(tag)
+    }
+
+    link = await Link.findOne({
+      where: {
+        id: link.id
+      },
+      include: {
+        model: Tag,
+        as: 'tags'
+      }
+    })
 
     res.status(201).json(link)
   },
