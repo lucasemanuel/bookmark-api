@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator')
 const { Link, Tag } = require('../models')
 
 module.exports = {
@@ -12,32 +13,38 @@ module.exports = {
     res.json(links)
   },
   store: async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
     const { title, url, tags } = req.body
     let link = await Link.create({ title, url })
 
-    const promisesFindOrCreateTags = tags.map(({ name }) =>
-      Tag.findOrCreate({
-        where: { name }
-      })
-    )
+    if (tags) {
+      const promisesFindOrCreateTags = tags.map(name =>
+        Tag.findOrCreate({
+          where: { name }
+        })
+      )
 
-    const promiseResults = await Promise.all(promisesFindOrCreateTags)
-    for (const result of promiseResults) {
-      const [tag] = result
-      await link.addTag(tag)
+      const promiseResults = await Promise.all(promisesFindOrCreateTags)
+      for (const result of promiseResults) {
+        await link.addTag(result[0])
+      }
+
+      link = await Link.findOne({
+        where: {
+          id: link.id
+        },
+        include: {
+          model: Tag,
+          as: 'tags'
+        }
+      })
     }
 
-    link = await Link.findOne({
-      where: {
-        id: link.id
-      },
-      include: {
-        model: Tag,
-        as: 'tags'
-      }
-    })
-
-    res.status(201).json(link)
+    return res.status(201).json(link)
   },
   update: async (req, res) => {
     const { id } = req.params
