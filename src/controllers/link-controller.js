@@ -1,5 +1,5 @@
 const { validationResult } = require('express-validator')
-const { Link, Tag } = require('../models')
+const { Link, Tag, sequelize } = require('../models')
 
 module.exports = {
   index: async (req, res) => {
@@ -18,33 +18,37 @@ module.exports = {
       return res.status(400).json({ errors: errors.array() })
     }
 
-    const { title, url, tags } = req.body
-    let link = await Link.create({ title, url })
+    const { title, url } = req.body
+    let { tags } = req.body
 
-    if (tags) {
-      const promisesFindOrCreateTags = tags.map(name =>
-        Tag.findOrCreate({
-          where: { name }
-        })
-      )
+    const transaction = await sequelize.transaction()
+    try {
+      const link = await Link.create({ title, url }, { transaction })
 
-      const promiseResults = await Promise.all(promisesFindOrCreateTags)
-      for (const result of promiseResults) {
-        await link.addTag(result[0])
+      if (tags) {
+        const promisesFindOrCreateTags = tags.map(name =>
+          Tag.findOrCreate({
+            where: { name },
+            transaction
+          })
+        )
+
+        const promiseResults = await Promise.all(promisesFindOrCreateTags)
+        tags = []
+        for (const [tag] of promiseResults) {
+          tags.push(tag)
+          await link.addTag(tag, { transaction })
+        }
       }
 
-      link = await Link.findOne({
-        where: {
-          id: link.id
-        },
-        include: {
-          model: Tag,
-          as: 'tags'
-        }
+      await transaction.commit()
+      return res.status(201).json({ ...link.toJSON(), tags })
+    } catch (error) {
+      await transaction.rollback()
+      return res.status(500).json({
+        message: 'Internal Server Error'
       })
     }
-
-    return res.status(201).json(link)
   },
   update: async (req, res) => {
     const { id } = req.params
