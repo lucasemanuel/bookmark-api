@@ -18,5 +18,15 @@ module.exports = {
     const [tag] = await Tag.findOrCreate({ where: { name } })
 
     res.status(201).json(tag)
+  },
+  destroy: async (req, res) => {
+    const { id } = req.params
+    const tag = await Tag.findOne({ where: { id } })
+
+    if (!tag) {
+      return res.status(404).json({ message: 'Not Found!' })
+    }
+    tag.destroy()
+    res.status(204).send()
   }
 }
