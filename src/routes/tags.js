@@ -1,8 +1,9 @@
 const express = require('express')
-const TagController = require('../controllers/tag-controller')
 const router = express.Router()
+const TagController = require('../controllers/tag-controller')
+const TagValidator = require('../validators/tag-validator')
 
 router.get('/', TagController.index)
-router.post('/', TagController.store)
+router.post('/', TagValidator.store, TagController.store)
 
 module.exports = router
