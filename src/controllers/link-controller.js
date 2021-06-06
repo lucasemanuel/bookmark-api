@@ -3,13 +3,7 @@ const { Link, Tag, sequelize } = require('../models')
 
 module.exports = {
   index: async (req, res) => {
-    const links = await Link.findAll({
-      include: {
-        model: Tag,
-        as: 'tags'
-      }
-    })
-
+    const links = await Link.findAll({ include: 'tags' })
     res.json(links)
   },
   store: async (req, res) => {
