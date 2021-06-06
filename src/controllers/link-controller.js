@@ -65,14 +65,19 @@ module.exports = {
     if (url) data.url = url
 
     link = await link.update(data)
-
     res.json(link)
   },
   destroy: async (req, res) => {
     const { id } = req.params
-    const link = await Link.findOne({ where: { id } })
-    link.destroy()
 
+    const link = await Link.findOne({ where: { id } })
+    if (!link) {
+      return res.status(404).json({
+        message: 'Not Found!'
+      })
+    }
+
+    link.destroy()
     res.status(204).send()
   }
 }
