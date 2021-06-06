@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.get('/', LinkController.index)
 router.post('/', LinkValidator.store, LinkController.store)
-router.put('/:id', LinkController.update)
+router.put('/:id', LinkValidator.update, LinkController.update)
 router.delete('/:id', LinkController.destroy)
 
 module.exports = router

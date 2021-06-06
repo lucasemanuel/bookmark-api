@@ -46,24 +46,31 @@ module.exports = {
     } catch (error) {
       await transaction.rollback()
       return res.status(500).json({
-        message: 'Internal Server Error'
+        message: 'Internal Server Error!'
       })
     }
   },
   update: async (req, res) => {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() })
+    }
+
     const { id } = req.params
     const { title, url } = req.body
 
-    const patch = {}
-    if (title) patch.title = title
-    if (url) patch.url = url
+    let link = await Link.findOne({ where: { id }, include: 'tags' })
+    if (!link) {
+      return res.status(404).json({
+        message: 'Not Found!'
+      })
+    }
 
-    await Link.update(patch, {
-      where: {
-        id
-      }
-    })
-    const link = await Link.findOne({ where: { id } })
+    const data = {}
+    if (title) data.title = title
+    if (url) data.url = url
+
+    link = await link.update(data)
 
     res.json(link)
   },

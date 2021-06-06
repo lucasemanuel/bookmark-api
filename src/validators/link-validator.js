@@ -10,12 +10,22 @@ module.exports = {
       .not()
       .isEmpty(),
     body('url')
-      .blacklist('')
+      .blacklist(' ')
       .isLength({
         max: 255
       })
       .not()
       .isEmpty(),
     check('tags.*').isAlphanumeric()
+  ],
+  update: [
+    body('title').isLength({
+      max: 255
+    }),
+    body('url')
+      .blacklist(' ')
+      .isLength({
+        max: 255
+      })
   ]
 }
