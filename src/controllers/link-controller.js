@@ -1,4 +1,5 @@
 const { validationResult } = require('express-validator')
+const { Op } = require('sequelize')
 const { Link, Tag, sequelize } = require('../models')
 
 module.exports = {
@@ -74,14 +75,57 @@ module.exports = {
   destroy: async (req, res) => {
     const { id } = req.params
 
-    const link = await Link.findOne({ where: { id } })
+    const link = await Link.findOne({ where: { id }, include: 'tags' })
     if (!link) {
       return res.status(404).json({
         message: 'Not Found!'
       })
     }
 
-    link.destroy()
-    res.status(204).send()
+    const promisesCountLinksByTags = link.tags.map(tag =>
+      Tag.findOne({
+        where: {
+          id: tag.id
+        },
+        include: {
+          as: 'links',
+          model: Link,
+          attributes: []
+        },
+        attributes: {
+          include: [
+            [sequelize.fn('COUNT', sequelize.col('links.id')), 'countLinks']
+          ]
+        }
+      })
+    )
+    const promiseResults = await Promise.all(promisesCountLinksByTags)
+
+    const tagsIdFromDelete = []
+    for (const tag of promiseResults) {
+      if (tag.toJSON().countLinks <= 1) {
+        tagsIdFromDelete.push(tag.id)
+      }
+    }
+
+    const transaction = await sequelize.transaction()
+    try {
+      await Tag.destroy({
+        where: {
+          id: {
+            [Op.in]: tagsIdFromDelete
+          }
+        }
+      })
+
+      await link.destroy()
+      await transaction.commit()
+      res.status(204).send()
+    } catch (error) {
+      await transaction.rollback()
+      return res.status(500).json({
+        message: 'Internal Server Error!'
+      })
+    }
   }
 }
