@@ -114,11 +114,12 @@ module.exports = {
         where: {
           id: {
             [Op.in]: tagsIdFromDelete
-          }
+          },
+          transaction
         }
       })
 
-      await link.destroy()
+      await link.destroy({ transaction })
       await transaction.commit()
       res.status(204).send()
     } catch (error) {
