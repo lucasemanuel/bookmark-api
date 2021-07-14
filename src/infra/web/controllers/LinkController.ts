@@ -1,6 +1,13 @@
 import { Request, Response } from 'express'
 import AddLinkUseCase from '../../../domain/useCases/AddLinkUseCase'
+import ListLinksUseCase from '../../../domain/useCases/ListLinksUseCase'
 import LinksRepository from '../../repositories/LinksRepository'
+
+abstract class MissingParamError {
+  public static message (paramError: string): string {
+    return `Missing param: ${paramError}`
+  }
+}
 
 abstract class LinkController {
   public static async store (
@@ -20,11 +27,17 @@ abstract class LinkController {
 
     return response.status(201).json(link)
   }
-}
 
-abstract class MissingParamError {
-  public static message (paramError: string): string {
-    return `Missing param: ${paramError}`
+  public static async list (
+    request: Request,
+    response: Response
+  ): Promise<Response> {
+    const linksRepository = new LinksRepository()
+    const listLinksUseCase = new ListLinksUseCase(linksRepository)
+
+    const links = await listLinksUseCase.execute()
+
+    return response.status(200).json(links)
   }
 }
 
