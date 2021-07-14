@@ -1,9 +1,18 @@
 import express from 'express'
+import { database } from './infra/database/MongoDB'
+import { MONGO_URL, APP_PORT } from './infra/config/Env'
+import router from './infra/web/routes'
 
 const app = express()
 
-app.get('/', (request, response) => {
-  return response.send('Hello')
-})
+app.use(express.json())
+app.use(router)
 
-app.listen(3333)
+database
+  .connect(MONGO_URL)
+  .then(() => {
+    app.listen(APP_PORT, () =>
+      console.log(`Server is running! Listening on port: ${APP_PORT}`)
+    )
+  })
+  .catch(console.error)
