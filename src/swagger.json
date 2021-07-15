@@ -1,0 +1,135 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Bookmark Web API",
+    "description": "API for manager your links",
+    "contact": {
+      "name": "Lucas Emanuel",
+      "url": "https://github.com/lucasemanuel/"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3333/v1",
+      "description": "API for test"
+    }
+  ],
+  "paths": {
+    "/links": {
+      "post": {
+        "summary": "Create a link",
+        "description": "Create and return the link",
+        "tags": ["Links"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Link"
+              },
+              "examples": {
+                "link": {
+                  "value": {
+                    "title": "Google",
+                    "url": "www.google.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing Param",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Get all links stored",
+        "summary": "Get all links stored",
+        "tags": ["Links"],
+        "responses": {
+          "200": {
+            "description": "Return all links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Link"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links/{id}": {
+      "delete": {
+        "summary": "Delete a link",
+        "description": "Delete a link by Id",
+        "tags": ["Links"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Link Id",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Link deleted"
+          },
+          "404": {
+            "description": "Link not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Link": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,11 +2,15 @@ import express from 'express'
 import { database } from './infra/database/MongoDB'
 import { MONGO_URL, APP_PORT } from './infra/config/Env'
 import router from './infra/web/routes'
+import swaggerUi from 'swagger-ui-express'
+import swaggerConfig from './swagger.json'
 
 const app = express()
 
 app.use(express.json())
-app.use(router)
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerConfig))
+app.use('/v1', router)
 
 database
   .connect(MONGO_URL)
