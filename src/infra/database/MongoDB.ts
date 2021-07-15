@@ -1,4 +1,4 @@
-import { Collection, MongoClient } from 'mongodb'
+import { Collection, MongoClient, ObjectId } from 'mongodb'
 
 class MongoDB {
   private client: any
@@ -14,6 +14,10 @@ class MongoDB {
 
   public async disconnect (): Promise<void> {
     await this.client.close()
+  }
+
+  public static generateObjectId (id: string): ObjectId {
+    return new ObjectId(id)
   }
 }
 
